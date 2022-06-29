@@ -4,8 +4,8 @@ import koren.proj.puzzlesolver.model.puzzle.AbstractPuzzle
 
 interface GenericSearchInterface {
 
-    abstract var parentMap : HashMap<AbstractPuzzle, AbstractPuzzle>
-    abstract var visitedSet : HashSet<AbstractPuzzle>
+    var parentMap : HashMap<AbstractPuzzle, AbstractPuzzle>
+    var visitedSet : HashSet<AbstractPuzzle>
 
     fun search(initial_puzzle: AbstractPuzzle, goal: AbstractPuzzle)
 }
