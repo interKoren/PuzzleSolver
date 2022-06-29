@@ -2,8 +2,8 @@ package koren.proj.puzzlesolver.model.puzzle
 
 abstract class AbstractPuzzle(private val state: Array<Array<String>>) {
 
-    abstract fun getChildren(): Array<AbstractPuzzle>
-    abstract fun checkValid(): Boolean
+    abstract fun generateSteps(): Collection<AbstractPuzzle>
+    protected abstract fun checkValid()
 
     override fun equals(other: Any?): Boolean {
         if (other is AbstractPuzzle){
