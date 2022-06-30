@@ -16,56 +16,11 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
         checkValid()
     }
 
-    private fun findXIndices(): Array<Int> {
-        // return indices of singular X value
-        val xRowIndex: Int = state.indices.first { row: Int -> state[row].contains(X_SQUARE) }
-        val xColIndex: Int = state.indices.first { col: Int -> state[xRowIndex][col] == X_SQUARE }
-
-        return arrayOf(xRowIndex, xColIndex)
-    }
-
-    private fun findXNeighboursIndices(xIndices: Array<Int>): Collection<Array<Int>> {
-        val neighIndLst: Collection<Array<Int>>
-        var initialNeighIndLst: Collection<Array<Int>> = LinkedList<Array<Int>>()
-
-        // add all possible neighbours indexes to list
-        val rightNeighbour = arrayOf(xIndices[0] + 1, xIndices[1])
-        val leftNeighbour = arrayOf(xIndices[0] - 1, xIndices[1])
-        val upNeighbour = arrayOf(xIndices[0], xIndices[1] + 1)
-        val downNeighbour = arrayOf(xIndices[0], xIndices[1] - 1)
-        initialNeighIndLst += listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
-
-        //define predicate for filtering legal indices
-        val legalIndices: (Array<Int>) -> Boolean = { (it[0] > 0 && it[1] > 0) &&
-                (it[0] < state.size && it[1] < state[it[0]].size) && (state[it[0]][it[1]] == EMPTY_SQUARE) }
-        // remove illegal neighbours
-        neighIndLst = initialNeighIndLst.filter(legalIndices)
-
-        return neighIndLst
-    }
-    private fun iterateCreatorSteps(
-        xNeighbours: Collection<Array<Int>>,
-        xIndices: Array<Int>): Collection<AbstractPuzzle> {
-
-        //iterate and create all possible next steps
-        val possibleSteps = LinkedList<AbstractPuzzle>()
-        for (neighInd in xNeighbours) {
-            val stateCopy: Array<Array<String>> = state.map { it.clone() }.toTypedArray()
-            // swapping the movable square
-            stateCopy[xIndices[0]][xIndices[1]] = stateCopy[neighInd[0]][neighInd[1]]
-            stateCopy[neighInd[0]][neighInd[1]] = X_SQUARE
-            possibleSteps += SlidingPuzzle(stateCopy)
-        }
-
-        return possibleSteps
-    }
-
     override fun generateSteps(): Collection<AbstractPuzzle> {
-        val xIndices: Array<Int> = findXIndices() // get X square indices
-        val xNeighbours: Collection<Array<Int>> = findXNeighboursIndices(xIndices) // get indices of X neighbours
+        val xPosition: Position = findXPosition()
+        val neighbours: List<Position> = findNeighboursPositions(xPosition) // get indices of X neighbours
 
-        // Generate all possible next steps
-        return iterateCreatorSteps(xNeighbours, xIndices)
+        return iterateCreatorSteps(neighbours, xPosition)
     }
 
     override fun checkValid() {
@@ -81,4 +36,56 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
         if (state.all{ row -> row.all(legalValsPredicate) }.not())
             throw IllegalArgumentException(ILLEGAL_VALUES_MESSAGE)
     }
+
+    private fun findXPosition(): Position {
+        val xRowIndex: Int = state.indices.first { row: Int -> state[row].contains(X_SQUARE) }
+        val xColIndex: Int = state.indices.first { col: Int -> state[xRowIndex][col] == X_SQUARE }
+
+        return Position(xRowIndex, xColIndex)
+    }
+
+    private fun findNeighboursPositions(xPosition: Position): List<Position> {
+        val rightNeighbour = Position(xPosition.rowIndex + 1, xPosition.colIndex)
+        val leftNeighbour = Position(xPosition.rowIndex - 1, xPosition.colIndex)
+        val upNeighbour = Position(xPosition.rowIndex, xPosition.colIndex + 1)
+        val downNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
+        val neighborsIndexList = listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
+
+        val legalIndex: (Position) -> Boolean = checkPossibleStepPosition()
+
+        return neighborsIndexList.filter(legalIndex)
+    }
+
+    private fun checkPossibleStepPosition(): (Position) -> Boolean = {
+        val checkPosition = it
+        val rowIndex = checkPosition.rowIndex
+        val colIndex = checkPosition.colIndex
+        val isIndexNotNegative = rowIndex >= 0 && colIndex >= 0
+        val isIndexSmallerThanMax = rowIndex < state.size && colIndex < state[rowIndex].size
+
+        isIndexNotNegative && isIndexSmallerThanMax && isEmptyPosition(checkPosition)
+    }
+
+    private fun iterateCreatorSteps(
+        neighboursPosition: Collection<Position>,
+        xPosition: Position
+    ): Collection<AbstractPuzzle> {
+
+        val possibleSteps = LinkedList<AbstractPuzzle>()
+        for (neighborPosition in neighboursPosition) {
+            val stateCopy: Array<Array<String>> = state.map { it.clone() }.toTypedArray()
+
+            stateCopy[xPosition.rowIndex][xPosition.colIndex] =
+                stateCopy[neighborPosition.rowIndex][neighborPosition.colIndex]
+            stateCopy[neighborPosition.rowIndex][neighborPosition.colIndex] = X_SQUARE
+            possibleSteps += MazePuzzle(stateCopy)
+        }
+
+        return possibleSteps
+    }
+
+    private fun isEmptyPosition(checkPosition: Position): Boolean {
+        return state[checkPosition.rowIndex][checkPosition.colIndex] == EMPTY_SQUARE
+    }
+
 }
