@@ -48,7 +48,7 @@ internal class SlidingPuzzleTest {
     }
 
     @Test
-    fun checkValidXOOccurrences() {
+    fun checkValidXOccurrences() {
 
         var exception = assertThrows(IllegalArgumentException::class.java)
         { SlidingPuzzle(missingXState) }

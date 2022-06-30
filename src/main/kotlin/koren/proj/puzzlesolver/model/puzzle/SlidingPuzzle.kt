@@ -2,6 +2,8 @@ package koren.proj.puzzlesolver.model.puzzle
 
 import java.util.LinkedList
 
+private const val ILLEGAL_MAZE_SIZE_MESSAGE = "Illegal maze size - empty"
+private const val X_ILLEGAL_OCCURRENCES_MESSAGE = "X occurring illegal amount of times"
 private const val X_SQUARE: String = "X"
 private const val X_OCCURRENCES: Int = 1
 
@@ -55,7 +57,6 @@ class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(s
     }
 
     override fun generateSteps(): Collection<AbstractPuzzle> {
-
         val xIndices: Array<Int> = findXIndices() // get X square indices
         val xNeighbours: Collection<Array<Int>> = findXNeighboursIndices(xIndices) // get indices of X neighbours
 
@@ -66,10 +67,10 @@ class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(s
     override fun checkValid() {
         val rowPredicateSize: (Array<String>) -> Boolean = { it.isEmpty()}
         if (state.isEmpty() || state.any(rowPredicateSize))
-            throw IllegalArgumentException("Illegal maze size - empty")
+            throw IllegalArgumentException(ILLEGAL_MAZE_SIZE_MESSAGE)
 
         val rowPredicateX: (String) -> Boolean = { it == X_SQUARE }
         if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(rowPredicateX) } != X_OCCURRENCES)
-            throw IllegalArgumentException("X occurring illegal amount of times")
+            throw IllegalArgumentException(X_ILLEGAL_OCCURRENCES_MESSAGE)
     }
 }
