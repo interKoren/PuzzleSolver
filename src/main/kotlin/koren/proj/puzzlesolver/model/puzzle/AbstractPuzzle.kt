@@ -9,7 +9,15 @@ abstract class AbstractPuzzle(private val state: Array<Array<String>>) {
         if (other is AbstractPuzzle){
             val otherAP: AbstractPuzzle = other
 
-            return otherAP.state.contentEquals(this.state)
+            if (otherAP.state.size != this.state.size) // checks mazes size
+                return false
+
+            var isEquals = true
+            for (rowInd in 0 until this.state.size) {
+                isEquals = isEquals && this.state[rowInd].contentEquals(otherAP.state[rowInd]) // checks mazes values
+            }
+
+            return isEquals
         }
         return false
     }

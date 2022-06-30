@@ -70,14 +70,14 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
     override fun checkValid() {
         val rowPredicateSize: (Array<String>) -> Boolean = { it.isEmpty()}
         if (state.isEmpty() || state.any(rowPredicateSize))
-            throw Exception("Illegal maze size - empty")
+            throw IllegalArgumentException("Illegal maze size - empty")
 
         val rowPredicateX: (String) -> Boolean = { it == X_SQUARE}
         if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(rowPredicateX) } == X_OCCURRENCES)
-            throw Exception("X occurring illegal amount of times")
+            throw IllegalArgumentException("X occurring illegal amount of times")
 
         val legalValsPredicate: (String) -> Boolean = { it == X_SQUARE || it == EMPTY_SQUARE || it == WALL}
         if (state.all{ row -> row.all(legalValsPredicate) })
-            throw Exception("There is illegal value in maze values")
+            throw IllegalArgumentException("There is illegal value in maze values")
     }
 }
