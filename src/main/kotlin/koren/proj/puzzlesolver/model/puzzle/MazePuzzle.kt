@@ -1,10 +1,10 @@
 package koren.proj.puzzlesolver.model.puzzle
 
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.IllegalMazeValues
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
 import java.util.*
 
-private const val ILLEGAL_MAZE_SIZE_MESSAGE = "Illegal maze size - empty"
-private const val X_ILLEGAL_OCCURRENCES_MESSAGE = "X occurring illegal amount of times"
-private const val ILLEGAL_VALUES_MESSAGE = "There is illegal values in maze - Allow only: 1 | 0 | X"
 private const val X_OCCURRENCES: Int = 1
 private const val X_SQUARE: String = "X"
 private const val EMPTY_SQUARE: String = "0"
@@ -25,16 +25,19 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
 
     override fun checkValid() {
         val rowPredicateSize: (Array<String>) -> Boolean = { it.isEmpty()}
-        if (state.isEmpty() || state.any(rowPredicateSize))
-            throw IllegalArgumentException(ILLEGAL_MAZE_SIZE_MESSAGE)
+        if (state.isEmpty() || state.any(rowPredicateSize)){
+            throw PuzzleSizeException()
+        }
 
-        val rowPredicateX: (String) -> Boolean = { it == X_SQUARE}
-        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(rowPredicateX) } != X_OCCURRENCES)
-            throw IllegalArgumentException(X_ILLEGAL_OCCURRENCES_MESSAGE)
+        val predicateX: (String) -> Boolean = { it == X_SQUARE}
+        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(predicateX) } != X_OCCURRENCES){
+            throw XOccurrencesException()
+        }
 
-        val legalValsPredicate: (String) -> Boolean = { it == X_SQUARE || it == EMPTY_SQUARE || it == WALL}
-        if (state.all{ row -> row.all(legalValsPredicate) }.not())
-            throw IllegalArgumentException(ILLEGAL_VALUES_MESSAGE)
+        val legalValuesPredicate: (String) -> Boolean = { it == X_SQUARE || it == EMPTY_SQUARE || it == WALL}
+        if (state.all{ row -> row.all(legalValuesPredicate) }.not()){
+            throw IllegalMazeValues()
+        }
     }
 
     private fun findXPosition(): Position {
@@ -45,10 +48,10 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
     }
 
     private fun findNeighboursPositions(xPosition: Position): List<Position> {
-        val rightNeighbour = Position(xPosition.rowIndex + 1, xPosition.colIndex)
-        val leftNeighbour = Position(xPosition.rowIndex - 1, xPosition.colIndex)
-        val upNeighbour = Position(xPosition.rowIndex, xPosition.colIndex + 1)
-        val downNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
+        val upNeighbour = Position(xPosition.rowIndex + 1, xPosition.colIndex)
+        val downNeighbour = Position(xPosition.rowIndex - 1, xPosition.colIndex)
+        val rightNeighbour = Position(xPosition.rowIndex, xPosition.colIndex + 1)
+        val leftNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
         val neighborsIndexList = listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
 
         val legalIndex: (Position) -> Boolean = checkPossibleStepPosition()

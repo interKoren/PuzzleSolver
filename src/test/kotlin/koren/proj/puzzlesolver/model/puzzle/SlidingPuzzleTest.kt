@@ -1,70 +1,56 @@
 package koren.proj.puzzlesolver.model.puzzle
 
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertDoesNotThrow
 
-private const val ILLEGAL_MAZE_SIZE_MESSAGE = "Illegal maze size - empty"
-private const val X_ILLEGAL_OCCURRENCES_MESSAGE = "X occurring illegal amount of times"
+
+private val ILLEGAL_ROW_STATE_SIZE: Array<Array<String>> = arrayOf()
+private val ILLEGAL_COL_STATE_SIZE: Array<Array<String>> = arrayOf(arrayOf("0", "0"), arrayOf(), arrayOf("1", "1"))
+private val MISSING_X_STATE: Array<Array<String>> = arrayOf(arrayOf("0", "0"), arrayOf("2"), arrayOf("1", "1"))
+private val MULTIPLE_X_STATE: Array<Array<String>> = arrayOf(arrayOf("0", "X"), arrayOf("2"), arrayOf("X", "1"))
+private val LEGAL_STATE: Array<Array<String>> = arrayOf(
+    arrayOf("23", "2", "1"), arrayOf("54", "X", "4"), arrayOf("2", "6", "5"))
+private val FIRST_FUTURE_STEP: Array<Array<String>> = arrayOf(
+    arrayOf("23", "2", "1"), arrayOf("54", "4", "X"), arrayOf("2", "6", "5"))
+private val SECOND_FUTURE_STEP: Array<Array<String>> = arrayOf(
+    arrayOf("23", "2", "1"), arrayOf("X", "54", "4"), arrayOf("2", "6", "5"))
+private val THIRD_FUTURE_STEP: Array<Array<String>> = arrayOf(
+    arrayOf("23", "X", "1"), arrayOf("54", "2", "4"), arrayOf("2", "6", "5"))
+private val FOURTH_FUTURE_STEP: Array<Array<String>> = arrayOf(
+    arrayOf("23", "2", "1"), arrayOf("54", "6", "4"), arrayOf("2", "X", "5"))
 
 internal class SlidingPuzzleTest {
 
-    private val illegalRowStateSize: Array<Array<String>> = arrayOf()
-    private val illegalColStateSize: Array<Array<String>> = arrayOf(arrayOf("0", "0"), arrayOf(), arrayOf("1", "1"))
-    private val missingXState: Array<Array<String>> = arrayOf(arrayOf("0", "0"), arrayOf("2"), arrayOf("1", "1"))
-    private val multipleXState: Array<Array<String>> = arrayOf(arrayOf("0", "X"), arrayOf("2"), arrayOf("X", "1"))
-    private val legalState: Array<Array<String>> = arrayOf(arrayOf("2", "3"), arrayOf("1", "X"))
-    private val firstFutureStep: Array<Array<String>> = arrayOf(arrayOf("2", "X"), arrayOf("1", "3"))
-    private val secFutureStep: Array<Array<String>> = arrayOf(arrayOf("2", "3"), arrayOf("X", "1"))
-
     @Test
     fun generateSteps() {
-        val slidingPuzzle = SlidingPuzzle(legalState)
-        val stepsLst = slidingPuzzle.generateSteps()
-        val expectedSteps = arrayOf(SlidingPuzzle(firstFutureStep), SlidingPuzzle(secFutureStep))
-        var i = 0
+        val slidingPuzzle = SlidingPuzzle(LEGAL_STATE)
+        val resultedSteps = slidingPuzzle.generateSteps()
+        val expectedSteps = listOf(SlidingPuzzle(FIRST_FUTURE_STEP), SlidingPuzzle(SECOND_FUTURE_STEP),
+            SlidingPuzzle(THIRD_FUTURE_STEP), SlidingPuzzle(FOURTH_FUTURE_STEP))
 
-        for (resulted in stepsLst) {
-            assertTrue(resulted == expectedSteps[i])
-            i += 1
-        }
+        assertTrue(resultedSteps.containsAll(expectedSteps) && resultedSteps.size == expectedSteps.size)
     }
 
     @Test
-    fun checkValidMazeSize() {
-
-        var exception: Exception = assertThrows(IllegalArgumentException::class.java)
-        { SlidingPuzzle(illegalRowStateSize) }
-        var expectedMessage = ILLEGAL_MAZE_SIZE_MESSAGE
-        var actualMessage = exception.message
-        assertTrue(actualMessage.equals(expectedMessage))
-
-        exception = assertThrows(IllegalArgumentException::class.java)
-        { SlidingPuzzle(illegalColStateSize) }
-        expectedMessage = ILLEGAL_MAZE_SIZE_MESSAGE
-        actualMessage = exception.message
-        assertTrue(actualMessage.equals(expectedMessage))
+    fun should_ThrowException_When_PuzzleIsEmpty() {
+        assertThrows(PuzzleSizeException::class.java) { SlidingPuzzle(ILLEGAL_ROW_STATE_SIZE) }
     }
 
     @Test
-    fun checkValidXOccurrences() {
-
-        var exception = assertThrows(IllegalArgumentException::class.java)
-        { SlidingPuzzle(missingXState) }
-        var expectedMessage = X_ILLEGAL_OCCURRENCES_MESSAGE
-        var actualMessage = exception.message
-        assertTrue(actualMessage.equals(expectedMessage))
-
-        exception = assertThrows(IllegalArgumentException::class.java)
-        { SlidingPuzzle(multipleXState) }
-        expectedMessage = X_ILLEGAL_OCCURRENCES_MESSAGE
-        actualMessage = exception.message
-        assertTrue(actualMessage.equals(expectedMessage))
+    fun should_ThrowException_When_PuzzleRowIsEmpty() {
+        assertThrows(PuzzleSizeException::class.java) { SlidingPuzzle(ILLEGAL_COL_STATE_SIZE) }
     }
 
     @Test
-    fun checkValidLegal() {
-        assertDoesNotThrow { SlidingPuzzle(legalState) }
+    fun should_ThrowException_When_X_Missing() {
+        assertThrows(XOccurrencesException::class.java) { SlidingPuzzle(MISSING_X_STATE) }
+    }
+
+    @Test
+    fun should_ThrowException_When_X_HasMultipleOccurrences() {
+        assertThrows(XOccurrencesException::class.java) { SlidingPuzzle(MULTIPLE_X_STATE) }
     }
 }
