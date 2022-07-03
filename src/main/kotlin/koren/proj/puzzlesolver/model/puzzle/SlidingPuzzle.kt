@@ -15,28 +15,34 @@ class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(s
 
     override fun generateSteps(): Collection<AbstractPuzzle> {
         val xPosition: Position = findXPosition()
-        val neighbours: List<Position> = findNeighboursPositions(xPosition) // get indices of X neighbours
+        val neighbours: List<Position> = findNeighboursPositions(xPosition)
 
-        return iterateCreatorSteps(neighbours, xPosition)
+        return createFutureStepsFromPositions(neighbours, xPosition)
     }
 
     override fun checkValid() {
-        val rowPredicateSize: (Array<String>) -> Boolean = { it.isEmpty()}
-        if (state.isEmpty() || state.any(rowPredicateSize)){
+        val validatePuzzleSize: (Array<String>) -> Boolean = { it.isEmpty()}
+        if (state.isEmpty() || state.any(validatePuzzleSize)){
             throw PuzzleSizeException()
         }
 
-        val predicateX: (String) -> Boolean = { it == X_SQUARE }
-        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(predicateX) } != X_OCCURRENCES){
+        val validateXOccurrences: (String) -> Boolean = { it == X_SQUARE }
+        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(validateXOccurrences) } != X_OCCURRENCES){
             throw XOccurrencesException()
         }
     }
 
     private fun findXPosition(): Position {
-        val xRowIndex: Int = state.indices.first { row: Int -> state[row].contains(X_SQUARE) }
-        val xColIndex: Int = state.indices.first { col: Int -> state[xRowIndex][col] == X_SQUARE }
+        var rowIndex = 0
+        var colIndex = 0
+        for (currentRowIndex in state.indices) {
+            if (state[currentRowIndex].contains(X_SQUARE)) {
+                rowIndex = currentRowIndex
+                colIndex = state[rowIndex].indexOf(X_SQUARE)
+            }
+        }
 
-        return Position(xRowIndex, xColIndex)
+        return Position(rowIndex, colIndex)
     }
 
     private fun findNeighboursPositions(xPosition: Position): List<Position> {
@@ -46,22 +52,19 @@ class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(s
         val leftNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
         val neighborsIndexList = listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
 
-        val legalIndex: (Position) -> Boolean = checkPossibleStepPosition()
-
-        return neighborsIndexList.filter(legalIndex)
+        return neighborsIndexList.filter { checkPosition: Position -> checkPossibleStepPosition(checkPosition) }
     }
 
-    private fun checkPossibleStepPosition(): (Position) -> Boolean = {
-        val checkPosition = it
+    private fun checkPossibleStepPosition(checkPosition: Position): Boolean {
         val rowIndex = checkPosition.rowIndex
         val colIndex = checkPosition.colIndex
         val isIndexNotNegative = rowIndex >= 0 && colIndex >= 0
         val isIndexSmallerThanMax = rowIndex < state.size && colIndex < state[rowIndex].size
 
-        isIndexNotNegative && isIndexSmallerThanMax
+        return isIndexNotNegative && isIndexSmallerThanMax
     }
 
-    private fun iterateCreatorSteps(
+    private fun createFutureStepsFromPositions(
         neighboursPosition: Collection<Position>,
         xPosition: Position
     ): Collection<AbstractPuzzle> {

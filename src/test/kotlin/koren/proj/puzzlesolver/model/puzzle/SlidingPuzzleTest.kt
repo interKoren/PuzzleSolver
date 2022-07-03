@@ -25,32 +25,33 @@ private val FOURTH_FUTURE_STEP: Array<Array<String>> = arrayOf(
 internal class SlidingPuzzleTest {
 
     @Test
-    fun generateSteps() {
+    fun shouldGeneratePossibleSteps() {
         val slidingPuzzle = SlidingPuzzle(LEGAL_STATE)
         val resultedSteps = slidingPuzzle.generateSteps()
         val expectedSteps = listOf(SlidingPuzzle(FIRST_FUTURE_STEP), SlidingPuzzle(SECOND_FUTURE_STEP),
             SlidingPuzzle(THIRD_FUTURE_STEP), SlidingPuzzle(FOURTH_FUTURE_STEP))
 
-        assertTrue(resultedSteps.containsAll(expectedSteps) && resultedSteps.size == expectedSteps.size)
+        assertTrue(resultedSteps.size == expectedSteps.size)
+        assertTrue(resultedSteps.containsAll(expectedSteps))
     }
 
     @Test
-    fun should_ThrowException_When_PuzzleIsEmpty() {
+    fun shouldThrowException_WhenPuzzleIsEmpty() {
         assertThrows(PuzzleSizeException::class.java) { SlidingPuzzle(ILLEGAL_ROW_STATE_SIZE) }
     }
 
     @Test
-    fun should_ThrowException_When_PuzzleRowIsEmpty() {
+    fun shouldThrowException_WhenPuzzleRowIsEmpty() {
         assertThrows(PuzzleSizeException::class.java) { SlidingPuzzle(ILLEGAL_COL_STATE_SIZE) }
     }
 
     @Test
-    fun should_ThrowException_When_X_Missing() {
+    fun shouldThrowException_WhenXMissing() {
         assertThrows(XOccurrencesException::class.java) { SlidingPuzzle(MISSING_X_STATE) }
     }
 
     @Test
-    fun should_ThrowException_When_X_HasMultipleOccurrences() {
+    fun shouldThrowException_WhenXHasMultipleOccurrences() {
         assertThrows(XOccurrencesException::class.java) { SlidingPuzzle(MULTIPLE_X_STATE) }
     }
 }

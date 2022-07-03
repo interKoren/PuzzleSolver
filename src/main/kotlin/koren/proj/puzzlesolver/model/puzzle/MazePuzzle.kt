@@ -1,6 +1,6 @@
 package koren.proj.puzzlesolver.model.puzzle
 
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.IllegalMazeValues
+import koren.proj.puzzlesolver.model.puzzle.puzzleException.IllegalMazeValuesException
 import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
 import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
 import java.util.*
@@ -18,33 +18,39 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
 
     override fun generateSteps(): Collection<AbstractPuzzle> {
         val xPosition: Position = findXPosition()
-        val neighbours: List<Position> = findNeighboursPositions(xPosition) // get indices of X neighbours
+        val neighbours: List<Position> = findNeighboursPositions(xPosition)
 
-        return iterateCreatorSteps(neighbours, xPosition)
+        return createFutureStepsFromPositions(neighbours, xPosition)
     }
 
     override fun checkValid() {
-        val rowPredicateSize: (Array<String>) -> Boolean = { it.isEmpty()}
-        if (state.isEmpty() || state.any(rowPredicateSize)){
+        val validatePuzzleSize: (Array<String>) -> Boolean = { it.isEmpty()}
+        if (state.isEmpty() || state.any(validatePuzzleSize)){
             throw PuzzleSizeException()
         }
 
-        val predicateX: (String) -> Boolean = { it == X_SQUARE}
-        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(predicateX) } != X_OCCURRENCES){
+        val validateXOccurrences: (String) -> Boolean = { it == X_SQUARE}
+        if (state.fold(0) { sumX, row: Array<String> -> sumX + row.count(validateXOccurrences) } != X_OCCURRENCES){
             throw XOccurrencesException()
         }
 
-        val legalValuesPredicate: (String) -> Boolean = { it == X_SQUARE || it == EMPTY_SQUARE || it == WALL}
-        if (state.all{ row -> row.all(legalValuesPredicate) }.not()){
-            throw IllegalMazeValues()
+        val validateMazeValues: (String) -> Boolean = { it == X_SQUARE || it == EMPTY_SQUARE || it == WALL}
+        if (state.all{ row -> row.all(validateMazeValues) }.not()){
+            throw IllegalMazeValuesException()
         }
     }
 
     private fun findXPosition(): Position {
-        val xRowIndex: Int = state.indices.first { row: Int -> state[row].contains(X_SQUARE) }
-        val xColIndex: Int = state.indices.first { col: Int -> state[xRowIndex][col] == X_SQUARE }
+        var rowIndex = 0
+        var colIndex = 0
+        for (currentRowIndex in state.indices) {
+            if (state[currentRowIndex].contains(X_SQUARE)) {
+                rowIndex = currentRowIndex
+                colIndex = state[rowIndex].indexOf(X_SQUARE)
+            }
+        }
 
-        return Position(xRowIndex, xColIndex)
+        return Position(rowIndex, colIndex)
     }
 
     private fun findNeighboursPositions(xPosition: Position): List<Position> {
@@ -69,7 +75,7 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
         isIndexNotNegative && isIndexSmallerThanMax && isEmptyPosition(checkPosition)
     }
 
-    private fun iterateCreatorSteps(
+    private fun createFutureStepsFromPositions(
         neighboursPosition: Collection<Position>,
         xPosition: Position
     ): Collection<AbstractPuzzle> {

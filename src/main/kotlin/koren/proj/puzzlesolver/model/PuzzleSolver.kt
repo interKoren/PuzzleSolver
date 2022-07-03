@@ -4,6 +4,7 @@ import koren.proj.puzzlesolver.model.puzzle.AbstractPuzzle
 import koren.proj.puzzlesolver.model.puzzle.MazePuzzle
 import koren.proj.puzzlesolver.model.puzzle.SlidingPuzzle
 import koren.proj.puzzlesolver.model.searchAlgo.BFS
+import koren.proj.puzzlesolver.model.searchAlgo.DFS
 import koren.proj.puzzlesolver.model.searchAlgo.GenericSearchInterface
 
 class PuzzleSolver(initial_state: Array<Array<String>>, goal_state: Array<Array<String>>,
@@ -30,7 +31,7 @@ class PuzzleSolver(initial_state: Array<Array<String>>, goal_state: Array<Array<
         }
         when(solverName) {
             "BFS" -> this.solver = BFS()
-            "DFS" -> this.solver = BFS()
+            "DFS" -> this.solver = DFS()
             else -> {
                 throw Exception("Illegal solver name")
             }
