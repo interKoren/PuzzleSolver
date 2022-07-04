@@ -19,4 +19,8 @@ abstract class AbstractPuzzle(private val state: Array<Array<String>>) {
 
         return true
     }
+
+    override fun toString(): String {
+        return "AbstractPuzzle(state=${state.contentToString()})"
+    }
 }

@@ -1,7 +1,7 @@
 package koren.proj.puzzlesolver.model.puzzle
 
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.PuzzleSizeException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
 import java.util.LinkedList
 
 private const val X_SQUARE: String = "X"
@@ -52,16 +52,21 @@ open class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuz
         val leftNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
         val neighborsIndexList = listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
 
-        return neighborsIndexList.filter { checkPosition: Position -> checkPossibleStepPosition(checkPosition) }
+        return neighborsIndexList.filter(checkPossibleStepPosition())
     }
 
-    private fun checkPossibleStepPosition(checkPosition: Position): Boolean {
-        val rowIndex = checkPosition.rowIndex
-        val colIndex = checkPosition.colIndex
-        val isIndexNotNegative = rowIndex >= 0 && colIndex >= 0
-        val isIndexSmallerThanMax = rowIndex < state.size && colIndex < state[rowIndex].size
+    private fun checkPossibleStepPosition(): (Position) -> Boolean = {
+        val checkPosition = it
 
-        return isIndexNotNegative && isIndexSmallerThanMax
+        isIndexNotNegative(checkPosition) && isIndexSmallerThanMax(checkPosition)
+    }
+
+    private fun isIndexNotNegative(checkPosition: Position): Boolean {
+        return checkPosition.rowIndex >= 0 && checkPosition.colIndex >= 0
+    }
+
+    private fun isIndexSmallerThanMax(checkPosition: Position): Boolean {
+        return checkPosition.rowIndex < state.size && checkPosition.colIndex < state[checkPosition.rowIndex].size
     }
 
     private fun createFutureStepsFromPositions(

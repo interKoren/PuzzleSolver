@@ -1,7 +1,7 @@
 package koren.proj.puzzlesolver.model.puzzle
 
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.PuzzleSizeException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test

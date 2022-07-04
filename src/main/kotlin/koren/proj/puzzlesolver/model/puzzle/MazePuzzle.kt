@@ -1,8 +1,8 @@
 package koren.proj.puzzlesolver.model.puzzle
 
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.IllegalMazeValuesException
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.XOccurrencesException
-import koren.proj.puzzlesolver.model.puzzle.puzzleException.PuzzleSizeException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.IllegalMazeValuesException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.PuzzleSizeException
 import java.util.*
 
 private const val X_OCCURRENCES: Int = 1
@@ -60,19 +60,26 @@ open class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle
         val leftNeighbour = Position(xPosition.rowIndex, xPosition.colIndex - 1)
         val neighborsIndexList = listOf(rightNeighbour, leftNeighbour, upNeighbour, downNeighbour)
 
-        val legalIndex: (Position) -> Boolean = checkPossibleStepPosition()
-
-        return neighborsIndexList.filter(legalIndex)
+        return neighborsIndexList.filter(checkPossibleStepPosition())
     }
 
     private fun checkPossibleStepPosition(): (Position) -> Boolean = {
         val checkPosition = it
-        val rowIndex = checkPosition.rowIndex
-        val colIndex = checkPosition.colIndex
-        val isIndexNotNegative = rowIndex >= 0 && colIndex >= 0
-        val isIndexSmallerThanMax = rowIndex < state.size && colIndex < state[rowIndex].size
 
-        isIndexNotNegative && isIndexSmallerThanMax && isEmptyPosition(checkPosition)
+        isIndexNotNegative(checkPosition) && isIndexSmallerThanMax(checkPosition)
+                && isEmptyPosition(checkPosition)
+    }
+
+    private fun isIndexNotNegative(checkPosition: Position): Boolean {
+        return checkPosition.rowIndex >= 0 && checkPosition.colIndex >= 0
+    }
+
+    private fun isIndexSmallerThanMax(checkPosition: Position): Boolean {
+        return checkPosition.rowIndex < state.size && checkPosition.colIndex < state[checkPosition.rowIndex].size
+    }
+
+    private fun isEmptyPosition(checkPosition: Position): Boolean {
+        return state[checkPosition.rowIndex][checkPosition.colIndex] == EMPTY_SQUARE
     }
 
     private fun createFutureStepsFromPositions(
@@ -93,8 +100,5 @@ open class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle
         return possibleSteps
     }
 
-    private fun isEmptyPosition(checkPosition: Position): Boolean {
-        return state[checkPosition.rowIndex][checkPosition.colIndex] == EMPTY_SQUARE
-    }
 
 }

@@ -1,4 +1,4 @@
-package koren.proj.puzzlesolver.model.puzzle.puzzleException
+package koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions
 
 private const val X_ILLEGAL_OCCURRENCES_MESSAGE = "X occurring illegal amount of times"
 
