@@ -10,7 +10,7 @@ private const val X_SQUARE: String = "X"
 private const val EMPTY_SQUARE: String = "0"
 private const val WALL: String = "1"
 
-class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(state) {
+open class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(state) {
 
     init {
         checkValid()
@@ -23,7 +23,7 @@ class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(stat
         return createFutureStepsFromPositions(neighbours, xPosition)
     }
 
-    override fun checkValid() {
+    final override fun checkValid() {
         val validatePuzzleSize: (Array<String>) -> Boolean = { it.isEmpty()}
         if (state.isEmpty() || state.any(validatePuzzleSize)){
             throw PuzzleSizeException()

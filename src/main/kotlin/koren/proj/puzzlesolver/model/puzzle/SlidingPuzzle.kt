@@ -7,7 +7,7 @@ import java.util.LinkedList
 private const val X_SQUARE: String = "X"
 private const val X_OCCURRENCES: Int = 1
 
-class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(state) {
+open class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(state) {
 
     init {
         checkValid()
@@ -20,7 +20,7 @@ class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuzzle(s
         return createFutureStepsFromPositions(neighbours, xPosition)
     }
 
-    override fun checkValid() {
+    final override fun checkValid() {
         val validatePuzzleSize: (Array<String>) -> Boolean = { it.isEmpty()}
         if (state.isEmpty() || state.any(validatePuzzleSize)){
             throw PuzzleSizeException()

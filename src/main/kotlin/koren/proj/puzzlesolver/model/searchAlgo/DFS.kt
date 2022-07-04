@@ -14,7 +14,6 @@ class DFS : GenericSearchInterface {
         var currentPuzzle = initialPuzzle
         val searchQueue: Stack<AbstractPuzzle> = Stack<AbstractPuzzle>()
         searchQueue.push(currentPuzzle)
-        visitedSet.add(currentPuzzle)
 
         while (!searchQueue.isEmpty() && currentPuzzle != goal) {
             currentPuzzle = searchQueue.pop()
