@@ -2,7 +2,6 @@ package koren.proj.puzzlesolver.model.puzzle
 
 import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.PuzzleSizeException
 import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
-import java.util.LinkedList
 
 private const val X_SQUARE: String = "X"
 private const val X_OCCURRENCES: Int = 1
@@ -13,7 +12,7 @@ open class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuz
         checkValid()
     }
 
-    override fun generateSteps(): Collection<AbstractPuzzle> {
+    override fun generateSteps(): Set<AbstractPuzzle> {
         val xPosition: Position = findXPosition()
         val neighbours: List<Position> = findNeighboursPositions(xPosition)
 
@@ -72,9 +71,9 @@ open class SlidingPuzzle (private val state: Array<Array<String>>) : AbstractPuz
     private fun createFutureStepsFromPositions(
         neighboursPosition: Collection<Position>,
         xPosition: Position
-    ): Collection<AbstractPuzzle> {
+    ): Set<AbstractPuzzle> {
 
-        val possibleSteps = LinkedList<AbstractPuzzle>()
+        val possibleSteps = HashSet<AbstractPuzzle>()
         for (neighborPosition in neighboursPosition) {
             val stateCopy: Array<Array<String>> = state.map { it.clone() }.toTypedArray()
 

@@ -7,10 +7,9 @@ import kotlin.collections.HashSet
 
 class BFS : GenericSearchInterface {
 
-    private val parentMap: HashMap<AbstractPuzzle, AbstractPuzzle> = HashMap()
-    private val visitedSet: HashSet<AbstractPuzzle> = HashSet()
-
-    override fun search(initialPuzzle: AbstractPuzzle, goal: AbstractPuzzle): Collection<AbstractPuzzle> {
+    override fun search(initialPuzzle: AbstractPuzzle, goal: AbstractPuzzle): List<AbstractPuzzle> {
+        val childToParentMap: HashMap<AbstractPuzzle, AbstractPuzzle> = HashMap()
+        val visitedSet: HashSet<AbstractPuzzle> = HashSet()
         var currentPuzzle = initialPuzzle
         val searchQueue: Queue<AbstractPuzzle> = LinkedList(listOf(currentPuzzle))
         visitedSet.add(currentPuzzle)
@@ -21,7 +20,7 @@ class BFS : GenericSearchInterface {
 
             for (currentNeighbor in currentNeighbors) {
                 if (!visitedSet.contains(currentNeighbor)) {
-                    parentMap[currentNeighbor] = currentPuzzle
+                    childToParentMap[currentNeighbor] = currentPuzzle
                     searchQueue.add(currentNeighbor)
                     visitedSet.add(currentNeighbor)
                 }
@@ -29,21 +28,25 @@ class BFS : GenericSearchInterface {
         }
 
         return if (currentPuzzle == goal) {
-            inferStepsToGoal(initialPuzzle, goal)
+            inferStepsToGoal(initialPuzzle, goal, childToParentMap)
         } else {
             LinkedList<AbstractPuzzle>()
         }
     }
 
-    private fun inferStepsToGoal(initPuzzle: AbstractPuzzle, goal: AbstractPuzzle): Collection<AbstractPuzzle> {
+    private fun inferStepsToGoal(
+        initPuzzle: AbstractPuzzle,
+        goal: AbstractPuzzle,
+        childToParentMap: HashMap<AbstractPuzzle, AbstractPuzzle>
+    ): List<AbstractPuzzle> {
         var currentPuzzle = goal
-        val stepsToGoal = LinkedList(listOf(currentPuzzle))
+        val stepsToFirstFromGoal = LinkedList(listOf(currentPuzzle))
 
         while (currentPuzzle != initPuzzle) {
-            stepsToGoal.add(parentMap[currentPuzzle])
-            currentPuzzle = parentMap[currentPuzzle]!!
+            stepsToFirstFromGoal.add(childToParentMap[currentPuzzle])
+            currentPuzzle = childToParentMap[currentPuzzle]!!
         }
 
-        return stepsToGoal.reversed()
+        return stepsToFirstFromGoal.reversed()
     }
 }

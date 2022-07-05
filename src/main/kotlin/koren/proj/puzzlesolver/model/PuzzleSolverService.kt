@@ -14,44 +14,47 @@ private const val SLIDING_PUZZLE_NAME = "Sliding"
 private const val BFS_SEARCHER = "BFS"
 private const val DFS_SEARCHER = "DFS"
 
-class PuzzleSolverService(initial_state: Array<Array<String>>, goal_state: Array<Array<String>>,
-                          puzzleName: String, searcherName: String) {
+class PuzzleSolverService() {
 
-    private val puzzle: AbstractPuzzle
-    private val solvedPuzzle: AbstractPuzzle
-    private val searcher: GenericSearchInterface
 
-    init {
+    fun solve(
+        puzzleName: String, searcherName: String,
+        initialState: Array<Array<String>>, goalState: Array<Array<String>>,
+    ): Collection<AbstractPuzzle> {
+        val (puzzle, goalPuzzle, searcher) = initialSearchArguments(puzzleName, searcherName, initialState, goalState)
+
+        return searcher.search(puzzle, goalPuzzle)
+    }
+
+    private fun initialSearchArguments(
+        puzzleName: String, searcherName: String,
+        initialState: Array<Array<String>>, goalState: Array<Array<String>>)
+    : Triple<AbstractPuzzle, AbstractPuzzle, GenericSearchInterface> {
+        val puzzle: AbstractPuzzle
+        val goalPuzzle: AbstractPuzzle
 
         when(puzzleName) {
             MAZE_PUZZLE_NAME -> {
-                this.puzzle = MazePuzzle(initial_state)
-                this.solvedPuzzle = MazePuzzle(goal_state)
+                puzzle = MazePuzzle(initialState)
+                goalPuzzle = MazePuzzle(goalState)
             }
             SLIDING_PUZZLE_NAME -> {
-                this.puzzle = SlidingPuzzle(initial_state)
-                this.solvedPuzzle = SlidingPuzzle(goal_state)
+                puzzle = SlidingPuzzle(initialState)
+                goalPuzzle = SlidingPuzzle(goalState)
             }
             else -> {
                 throw IllegalMazeNameException()
             }
         }
-        when(searcherName) {
-            BFS_SEARCHER -> this.searcher = BFS()
-            DFS_SEARCHER -> this.searcher = DFS()
+
+        val searcher: GenericSearchInterface = when (searcherName) {
+            BFS_SEARCHER -> BFS()
+            DFS_SEARCHER -> DFS()
             else -> {
                 throw IllegalSearcherNameException()
             }
         }
-    }
 
-    fun solve(): Collection<AbstractPuzzle> {
-        val stepsList = searcher.search(this.puzzle, this.solvedPuzzle)
-
-        for (step in stepsList) {
-            println(step)
-        }
-
-        return stepsList
+        return Triple(puzzle, goalPuzzle, searcher)
     }
 }

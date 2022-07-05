@@ -1,9 +1,8 @@
 package koren.proj.puzzlesolver.model.puzzle
 
 import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.IllegalMazeValuesException
-import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
 import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.PuzzleSizeException
-import java.util.*
+import koren.proj.puzzlesolver.model.customeExceptions.puzzleExceptions.XOccurrencesException
 
 private const val X_OCCURRENCES: Int = 1
 private const val X_SQUARE: String = "X"
@@ -16,7 +15,7 @@ open class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle
         checkValid()
     }
 
-    override fun generateSteps(): Collection<AbstractPuzzle> {
+    override fun generateSteps(): Set<AbstractPuzzle> {
         val xPosition: Position = findXPosition()
         val neighbours: List<Position> = findNeighboursPositions(xPosition)
 
@@ -85,9 +84,9 @@ open class MazePuzzle (private val state: Array<Array<String>>) : AbstractPuzzle
     private fun createFutureStepsFromPositions(
         neighboursPosition: Collection<Position>,
         xPosition: Position
-    ): Collection<AbstractPuzzle> {
+    ): Set<AbstractPuzzle> {
 
-        val possibleSteps = LinkedList<AbstractPuzzle>()
+        val possibleSteps = HashSet<AbstractPuzzle>()
         for (neighborPosition in neighboursPosition) {
             val stateCopy: Array<Array<String>> = state.map { it.clone() }.toTypedArray()
 

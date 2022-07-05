@@ -4,5 +4,5 @@ import koren.proj.puzzlesolver.model.puzzle.AbstractPuzzle
 
 interface GenericSearchInterface {
 
-    fun search(initialPuzzle: AbstractPuzzle, goal: AbstractPuzzle): Collection<AbstractPuzzle>
+    fun search(initialPuzzle: AbstractPuzzle, goal: AbstractPuzzle): List<AbstractPuzzle>
 }

@@ -2,7 +2,7 @@ package koren.proj.puzzlesolver.model.puzzle
 
 abstract class AbstractPuzzle(private val state: Array<Array<String>>) {
 
-    abstract fun generateSteps(): Collection<AbstractPuzzle>
+    abstract fun generateSteps(): Set<AbstractPuzzle>
     protected abstract fun checkValid()
 
     override fun hashCode(): Int {

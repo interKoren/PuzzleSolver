@@ -23,13 +23,12 @@ private val SECOND_FUTURE_STEP: Array<Array<String>> = arrayOf(
 internal class MazePuzzleTest {
 
     @Test
-    fun shouldGeneratePossibleSteps() {
+    fun shouldGeneratePossibleSteps_whenMazeHasPossibleSteps() {
         val mazePuzzle = MazePuzzle(LEGAL_STATE)
         val resultedSteps = mazePuzzle.generateSteps()
-        val expectedSteps = listOf(MazePuzzle(FIRST_FUTURE_STEP), MazePuzzle(SECOND_FUTURE_STEP))
+        val expectedSteps = setOf<AbstractPuzzle>(MazePuzzle(FIRST_FUTURE_STEP), MazePuzzle(SECOND_FUTURE_STEP))
 
-        assertTrue(resultedSteps.size == expectedSteps.size)
-        assertTrue(resultedSteps.containsAll(expectedSteps))
+        assertTrue(resultedSteps == expectedSteps)
     }
 
     @Test

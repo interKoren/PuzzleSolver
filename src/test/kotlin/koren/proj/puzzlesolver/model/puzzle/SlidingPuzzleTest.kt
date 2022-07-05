@@ -25,14 +25,13 @@ private val FOURTH_FUTURE_STEP: Array<Array<String>> = arrayOf(
 internal class SlidingPuzzleTest {
 
     @Test
-    fun shouldGeneratePossibleSteps() {
+    fun shouldGeneratePossibleSteps_whenMazeHasPossibleSteps() {
         val slidingPuzzle = SlidingPuzzle(LEGAL_STATE)
         val resultedSteps = slidingPuzzle.generateSteps()
-        val expectedSteps = listOf(SlidingPuzzle(FIRST_FUTURE_STEP), SlidingPuzzle(SECOND_FUTURE_STEP),
+        val expectedSteps = setOf<AbstractPuzzle>(SlidingPuzzle(FIRST_FUTURE_STEP), SlidingPuzzle(SECOND_FUTURE_STEP),
             SlidingPuzzle(THIRD_FUTURE_STEP), SlidingPuzzle(FOURTH_FUTURE_STEP))
 
-        assertTrue(resultedSteps.size == expectedSteps.size)
-        assertTrue(resultedSteps.containsAll(expectedSteps))
+        assertTrue(resultedSteps == expectedSteps)
     }
 
     @Test
